@@ -109,8 +109,8 @@ def compareBoundingEdges(contours1: list, contours2: list, cutHeight: float, sho
     print(x2min, x2max, y2min, y2max)
 
     # Find differences
-    differences = {'Bottom Left Corner' : x1min - x2min, 'Top Left Corner': y1min - y2min,
-                   'Bottom Right Corner' : x1max - x2max, 'Top Right Corner' : y1max - y2max}
+    differences = {'Leftmost Point' : x1min - x2min, 'Bottommost Point': y1min - y2min,
+                   'Rightmost Point' : x1max - x2max, 'Topmost Point' : y1max - y2max}
 
     return differences
 
