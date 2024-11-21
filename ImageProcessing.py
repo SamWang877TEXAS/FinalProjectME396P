@@ -73,6 +73,23 @@ def createContours(edges: list, drawContours = False) -> list:
     return contours
 
 
+def maximumHeight(contours: list) -> float:
+    '''
+    Returns the maximum height/y-value of the input contours list
+    :param contours: contours for the image to analyze
+    :return: Maximum height of all points detected (float)
+    '''
+    # First: convert to x, y coordinates
+    x1, y1 = list(), list()
+    for i in contours:
+        for j in i:
+            row, col = j[0]
+            x1.append(row)
+            y1.append(-1 * col)
+
+    return max(y1) * -1
+
+
 def compareBoundingEdges(contours1: list, contours2: list, cutHeight: float, showCutImage = False) -> dict():
     '''
     Compares the two images' bounding boxes
@@ -215,14 +232,20 @@ def plotEdgesonImage(image, edges):
 
 if __name__ == "__main__":
     # Example of how to run these functions
+
+    # Canny Edges / Contours
     edges1 = CannyProcess('IMG_8336.jpg')
     edges2 = CannyProcess('IMGB.jpg')
 
     contours1 = createContours(edges1)
     contours2 = createContours(edges2)
 
-    differences = compareBoundingEdges(contours1, contours2, cutHeight = 2000, showCutImage = True)
+    # Get maximum height for one of these contours (can use this to determine cutHeight for comparison)
+    print(maximumHeight(contours1))
 
+    # Difference using Bounding Box Method
+    differences = compareBoundingEdges(contours1, contours2, cutHeight = 2000, showCutImage = True)
     print(differences)
 
+    # Difference comparing Point by Point
     print(closestPointComparison(contours1, contours2, cutHeight = 2000))
