@@ -6,6 +6,10 @@ import numpy as np
 import cv2 as cv
 from matplotlib import pyplot as plt
 from PIL import Image
+from sklearn.datasets import make_regression
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsRegressor
+from sklearn.metrics import mean_squared_error, r2_score
 
 
 def CannyProcess(image) -> list:
@@ -115,6 +119,86 @@ def compareBoundingEdges(contours1: list, contours2: list, cutHeight: float, sho
     return differences
 
 
+def closestPointComparison(contours1: list, contours2: list, cutHeight: float, distance_threshold = 15) -> bool:
+    '''
+    Compares every point to its closest point on the other image.
+    :param contours1: List of contours for the first image
+    :param contours2: List of contours for the second image
+    :param cutHeight: Data above this height will be ignored
+    :return: Boolean stating whether the image is similar/warping is detected. TRUE means it is similar. FALSE means it is different.
+    '''
+    # First: convert to x, y coordinates
+    xy1, xy2 = list(), list()
+    for i in contours1:
+        for j in i:
+            row, col = j[0]
+            if col > cutHeight:
+                xy1.append((row, -1*col))
+
+    for i in contours2:
+        for j in i:
+            row, col = j[0]
+            if col > cutHeight:
+                xy2.append((row, -1 * col))
+
+    xy1, xy2 = np.array(xy1), np.array(xy2)
+
+    # Find closest point in xy2 for each point in xy1
+    for point in xy1:
+        distances = np.linalg.norm(xy2 - point, axis=1)
+        min_index = np.argmin(distances)
+        # print(distances[min_index]) for debugging
+        if distances[min_index] > distance_threshold: # If closest point is above threshold, return False
+            return False
+
+    # Otherwise, return True
+    return True
+
+
+def kNNComparison(contours1: list, contours2: list, cutHeight: float, showCutImage = False):
+    '''
+    Compares two images using a kNN regression as I learned in SDS322E: Elements of Data Science. I left in for usage sake, but
+    it doesn't seem to work too well.
+    :param contours1: List of contours for the first image
+    :param contours2: List of contours for the second image
+    :param cutHeight: Data above this height will be ignored
+    :return:
+    '''
+    # First: convert to x, y coordinates
+    x1, y1, x2, y2 = list(), list(), list(), list()
+    for i in contours1:
+        for j in i:
+            row, col = j[0]
+            if col > cutHeight:
+                x1.append(row)
+                y1.append(-1 * col)
+
+    for i in contours2:
+        for j in i:
+            row, col = j[0]
+            if col > cutHeight:
+                x2.append(row)
+                y2.append(-1 * col)
+
+    x1, y1, x2, y2 = np.array(x1).reshape(-1,1), np.array(y1).reshape(-1,1), np.array(x2).reshape(-1,1), np.array(y2).reshape(-1,1)
+    knn_regressor = KNeighborsRegressor(n_neighbors=5)
+    knn_regressor.fit(x1, y1)
+    y_pred = knn_regressor.predict(x2)
+    mse = mean_squared_error(y2, y_pred)
+    r2 = r2_score(y2, y_pred)
+
+    print(f'Mean Squared Error: {mse}')
+    print(f'R-squared: {r2}')
+
+    plt.scatter(x2, y2, color='blue', label='Actual')
+    plt.scatter(x2, y_pred, color='red', label='Predicted')
+    plt.title('KNN Regression')
+    plt.xlabel('Feature')
+    plt.ylabel('Target')
+    plt.legend()
+    plt.show()
+
+
 def plotEdgesonImage(image, edges):
     '''
     Compares the detected edges to the source image for troubleshooting
@@ -140,3 +224,5 @@ if __name__ == "__main__":
     differences = compareBoundingEdges(contours1, contours2, cutHeight = 2000, showCutImage = True)
 
     print(differences)
+
+    print(closestPointComparison(contours1, contours2, cutHeight = 2000))
