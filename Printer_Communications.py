@@ -3,7 +3,7 @@ import json
 import time
 
 
-ip1 = "192.168.0.17"
+
 
 def issue_gcode(ip, com, filename=""):
     # response = requests.post(f"{api_url}/machine/control", json={"command": "M0"})
@@ -20,14 +20,22 @@ def request_status(ip):
 
 if __name__ == "__main__":
 
+    ip1 = "192.168.0.17"
+
     status_P1 = request_status(ip1)
     print(status_P1)
-
+    #
     print('------')
 
     time.sleep(10) # Seconds to pause
-
-    issue_gcode(ip1, "M25")  # M25 = pause print; M24 = resume print
+    #
+    issue_gcode(ip1, "M24")  # M25 = pause print; M24 = resume print
 
     status_P1 = request_status(ip1)
     print(status_P1)# = request_status(ip_P2)
+    # print('---x---')
+    # print(type(status_P1))
+    # print('coords:' , status_P1['coords'])
+    # print('xyz:' , status_P1['coords']['xyz'])
+    # print('z value:' , status_P1['coords']['xyz'][2])
+    # status_P1['coords']['xyz']
