@@ -4,38 +4,48 @@ import time
 
 
 
-
-def issue_gcode(ip, com, filename=""):
+def issue_gcode(ip, com='', filename=""):
     # response = requests.post(f"{api_url}/machine/control", json={"command": "M0"})
     base_request = ("http://{0}:{1}/rr_gcode?gcode=" + com).format(ip,"")
-    r = requests.get(base_request)
+    lol = 'http://192.168.0.187/api/v1/auth/verify'
+    r = requests.get(lol)
     return r
 
 
-def request_status(ip):
+def request_z_position(ip):
 
-    base_request = ("http://{0}:{1}/rr_status?type=0").format(ip,"")
-    return requests.get(base_request).json()
+    # ef='http://192.168.0.187/api/v1/printer/status'
+    # ef = 'http://192.168.0.187/api/v1/printer/heads/0/position'
+    base_request = ("http://{0}:{1}/api/v1/printer/heads/0/position").format(ip,"")
+    return requests.get(base_request).json()['z']
+
+def request_printing_status(ip):
+
+    # ef='http://192.168.0.187/api/v1/printer/status'
+    ef = 'http://192.168.0.187/api/v1/printer/heads/0/position'
+    base_request = ("http://{0}:{1}/api/v1/printer/status").format(ip,"")
+
+
+    return requests.get(base_request).json() == 'printing'
 
 
 if __name__ == "__main__":
-
-    ip1 = "192.168.0.17"
-
-    status_P1 = request_status(ip1)
-    print(status_P1)
-    #
-    print('------')
-
-    time.sleep(10) # Seconds to pause
-    #
-    issue_gcode(ip1, "M24")  # M25 = pause print; M24 = resume print
-
-    status_P1 = request_status(ip1)
-    print(status_P1)# = request_status(ip_P2)
-    # print('---x---')
+    ip1 = "192.168.0.187"
+    print(request_printing_status(ip1))
+    print(request_z_position(ip1))
+    print(issue_gcode(ip1))
+    # status_P1 = request_status(ip1)
     # print(type(status_P1))
-    # print('coords:' , status_P1['coords'])
-    # print('xyz:' , status_P1['coords']['xyz'])
-    # print('z value:' , status_P1['coords']['xyz'][2])
-    # status_P1['coords']['xyz']
+    # print(status_P1)
+    # print(status_P1[0]['extruders'][0])
+    # print((status_P1[0]['extruders'][0]['hotend']))
+    # print('------')
+
+    #
+    #
+    # time.sleep(10)
+    #
+    # issue_gcode(ip1, "M24")
+    #
+    # status_P1 = request_status(ip1)
+    # print(status_P1)# = request_status(ip_P2)
