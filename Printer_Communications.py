@@ -1,21 +1,34 @@
 import requests
 
 
-def issue_gcode(ip, com='', filename=""):
-
+def issue_gcode(ip, com=''):
+    '''
+    Method used to pause or resume code
+    :param ip: printer ip address
+    :param com: communication command. 'M25' = pause print; 'M24' = resume print
+    :return: printing status
+    '''
     base_request = ("http://{0}:{1}/rr_gcode?gcode=" + com).format(ip,"")
     r = requests.get(base_request)
     return r
 
 
-
 def request_z_position(ip):
-
+    '''
+    Method used to get printer's extruder z-height position
+    :param ip: printer ip address
+    :return: return the printer's extruder z-height position
+    '''
     base_request = ("http://{0}:{1}/rr_status?type=0").format(ip,"")
     return requests.get(base_request).json()['coords']['xyz'][2]
 
-def request_printing_status(ip):
 
+def request_printing_status(ip):
+    '''
+    Method to get printer's printing status'
+    :param ip: printer ip address
+    :return: 'P' = printing; 'I' = idle/paused
+    '''
     base_request = ("http://{0}:{1}/rr_status?type=0").format(ip,"")
     return requests.get(base_request).json()
 
