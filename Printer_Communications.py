@@ -1,7 +1,4 @@
 import requests
-import json
-import time
-
 
 
 def issue_gcode(ip, com='', filename=""):
@@ -25,9 +22,9 @@ def request_printing_status(ip):
 
 if __name__ == "__main__":
 
-    ip1 = "192.168.0.187"
+    ip1 = "192.168.0.17"
     print(request_printing_status(ip1)) # Need to clean up method to return True or False on if printer is printing
     print(request_z_position(ip1))
 
-    issue_gcode(ip1, "M25")  # M25 = pause print; M24 = resume print
+    # issue_gcode(ip1, "M25")  # M25 = pause print; M24 = resume print
 
