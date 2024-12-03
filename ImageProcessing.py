@@ -30,7 +30,7 @@ def CannyProcess(image) -> list:
 
     # Bounds for color selection CHANGE THIS TO CHANGE WHAT COLOR IS PICKED UP
     lower_bound = np.array([0,90,0])
-    upper_bound = np.array([255,255,255])
+    upper_bound = np.array([100,255,255])
 
     # Create a mask around the color
     mask = cv.inRange(img_hsv, lower_bound, upper_bound)
@@ -126,6 +126,7 @@ def compareBoundingEdges(contours1: list, contours2: list, cutHeight: float, sho
     x1min, x1max, y1min, y1max = min(x1), max(x1), min(y1), max(y1)
     x2min, x2max, y2min, y2max = min(x2), max(x2), min(y2), max(y2)
 
+    print('Bounding Box Edges:')
     print(x1min, x1max, y1min, y1max)
     print(x2min, x2max, y2min, y2max)
 
@@ -231,21 +232,31 @@ def plotEdgesonImage(image, edges):
 
 
 if __name__ == "__main__":
-    # Example of how to run these functions
+   # Example of how to run these functions
 
     # Canny Edges / Contours
-    edges1 = CannyProcess('IMG_8336.jpg')
-    edges2 = CannyProcess('IMGB.jpg')
+    edges1 = CannyProcess('z_height_8.05.jpg')
+    # edges1 = CannyProcess('z_height_10.05.jpg')
+    # edges1 = CannyProcess('z_height_15.25.jpg')
+    edges2 = CannyProcess('z_height_6.45.jpg')
+    # edges2 = CannyProcess('z_height_2.05.jpg')
 
     contours1 = createContours(edges1)
     contours2 = createContours(edges2)
 
     # Get maximum height for one of these contours (can use this to determine cutHeight for comparison)
+    print('Maximum Height:')
     print(maximumHeight(contours1))
 
-    # Difference using Bounding Box Method
-    differences = compareBoundingEdges(contours1, contours2, cutHeight = 2000, showCutImage = True)
-    print(differences)
+    try:
+        # Difference using Bounding Box Method, cutHeight is adjustable depending on your requirements
+        differences = compareBoundingEdges(contours1, contours2, cutHeight = maximumHeight(contours2) + 40, showCutImage = True)
+        # print('Bounding Box Differences:')
+        # print(differences)
 
-    # Difference comparing Point by Point
-    print(closestPointComparison(contours1, contours2, cutHeight = 2000))
+        # Difference comparing Point by Point
+        print(closestPointComparison(contours1, contours2, cutHeight = maximumHeight(contours2) + 40, distance_threshold = 5))
+    except ValueError: # If you cut/filter too low, then there will be no points, this error catches it!
+        print('Empty after cutting height')
+    except:
+        print('An unexpected error has occured.')
