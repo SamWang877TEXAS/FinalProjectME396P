@@ -17,6 +17,9 @@ The final file is app.py. This is what actually brings all the code together. Th
 
 Our version of app.py leverages os, time, openCV, and pyrealsense2. Note that pyrealsense2 is a package specifically meant to work with Intel's cameras. This is a great package as it is already in Python, making working with it easier. A different package may need to be utilized for a different camera system.
 
+# Example Images
+Note that we provided several example images from our testing. To actually use this with a printer, you will need to run app.py with all the other python files. However, if you only want to see the "computer vision aspect," as in analyzing the contours of an image, you can run the main method in Image_Processing.py as an example. You will need to download the provided images and place them in the same directory as the Python file. Note that this example in the main method, once again, is not meant to actually communicate with a printer--it is used to visualize what is happening during the contour detection process. Feel free to change the HSV bounds to change what colors are detected and the cutHeight/distance_threshold variables to adjust the image output. Details for use are commented in the code. 
+
 # Example of Usage 
 Please visit our presentation for an example running the actual project!
 https://docs.google.com/presentation/d/1aKQaJyy-p1ypOjL1e1rcOHIyakJbBc2SEEk6Eyx1RUc/edit#slide=id.p
