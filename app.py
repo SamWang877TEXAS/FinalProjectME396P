@@ -56,15 +56,16 @@ if __name__ == "__main__":
     save_folder = "./images"
     z_height = 0  # Initialize z-height
     last_contours = None
-    step_size = 5  # mm
-    ip = "192.168.0.17"  # Replace with your printer's IP
+    step_size = 2  # mm
+    ip = "192.168.0.16"  # Replace with your printer's IP
+    all_contours = []
 
     while True:
         # Get the current z-height from the printer (replace with actual G-code communication)
         current_z_height = request_z_position(ip)
 
         # Check if the printer has moved the specified step size
-        if current_z_height - z_height >= step_size:
+        if current_z_height - z_height >= step_size and current_z_height - z_height <= step_size+1:
             z_height = current_z_height
 
             # Capture and save an image
@@ -73,13 +74,19 @@ if __name__ == "__main__":
             # Process the image
             edges = CannyProcess(image_path)
             contours = createContours(edges)
+            all_contours.append(contours)
 
             # Compare contours if this is not the first image
             if last_contours is not None:
-                similar = closestPointComparison(last_contours , contours, cutHeight = maximumHeight(last_contours) - 10)
-                if not similar:
-                    print(f"Contours differ at z-height {z_height}. Pausing printer.")
-                    issue_gcode(ip, "M25")  # Pause the printer
+                for contour in all_contours:
+                    try:
+                        similar = closestPointComparison(all_contours[-1], contour, cutHeight = maximumHeight(contour) + 40)
+                        if not similar:
+                            print(f"Contours differ at z-height {z_height}. Pausing printer.")
+                            issue_gcode(ip, "M25")  # Pause the printer
+                            break
+                    except ValueError:
+                        continue
 
             # Update last_contours
             last_contours = contours
