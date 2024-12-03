@@ -20,3 +20,5 @@ Our version of app.py leverages os, time, openCV, and pyrealsense2. Note that py
 # Example of Usage 
 Please visit our presentation for an example running the actual project!
 https://docs.google.com/presentation/d/1aKQaJyy-p1ypOjL1e1rcOHIyakJbBc2SEEk6Eyx1RUc/edit#slide=id.p
+
+There are also a couple of example images provided in the files.
